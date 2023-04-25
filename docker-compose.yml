@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  accounts:
+    image: imbuka/accounts:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - eassybank-network
+
+  loans:
+    image: imbuka/loans:latest
+    mem_limit: 700m
+    ports:
+      - "8081:8081"
+    networks:
+      - eassybank-network
+
+  cards:
+    image: imbuka/cards:latest
+    mem_limit: 700m
+    ports:
+      - "8082:8082"
+    networks:
+      - eassybank-network
+
+networks:
+  eassybank-network:

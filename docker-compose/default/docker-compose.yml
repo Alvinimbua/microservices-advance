@@ -1,0 +1,115 @@
+version: "3.8"
+
+services:
+
+  configserver:
+    image: imbuka/configserver:latest
+    mem_limit: 700m
+    ports:
+      - "8071:8071"
+    networks:
+      - eassybank-network
+
+  eurekaserver:
+      image: imbuka/eurekaserver:latest
+      mem_limit: 700m
+      ports:
+        - "8070:8070"
+      networks:
+        - eassybank-network
+      depends_on:
+        - configserver
+      deploy:
+        restart_policy:
+          condition: on-failure
+          delay: 15s
+          max_attempts: 3
+          window: 120s
+      environment:
+        SPRING_PROFILES_ACTIVE: default
+        SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
+  accounts:
+    image: imbuka/accounts:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - eassybank-network
+    depends_on:
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka
+
+  accounts1:
+    image: imbuka/accounts:latest
+    mem_limit: 700m
+    ports:
+      - "8083:8080"
+    networks:
+      - eassybank-network
+    depends_on:
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka
+
+  loans:
+    image: imbuka/loans:latest
+    mem_limit: 700m
+    ports:
+      - "8081:8081"
+    networks:
+      - eassybank-network
+    depends_on:
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka
+
+  cards:
+    image: imbuka/cards:latest
+    mem_limit: 700m
+    ports:
+      - "8082:8082"
+    networks:
+      - eassybank-network
+    depends_on:
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka
+
+networks:
+  eassybank-network:
